@@ -11,7 +11,7 @@ dlg_title = 'Parameter Simulation RT-LAB ';
 num_lines= 1;
 def     = {'1e-5','50'}; %Default 
 answer  = inputdlg(prompt,dlg_title,num_lines,def);
-Ts = str2double(cell2mat(answer(1)));
+Ts = str2double(cell2mat(answer(1))); %s 
 Fn= str2double(cell2mat(answer(2))); %Hz 
 
 %%% Insert Number of Output of SM and SC  
@@ -20,15 +20,15 @@ dlg_title = 'Parameter Simulation RT-LAB ';
 num_lines= 1;
 def     = {'1','1'}; %Default 
 answer  = inputdlg(prompt,dlg_title,num_lines,def);
-SM_Output = str2double(cell2mat(answer(1)));
+SM_Output = str2double(cell2mat(answer(1))); 
 SC_Output= str2double(cell2mat(answer(2))); 
 
 
 %% From Simulink File 
-casefile = 'Simulazione_1_DM'; %TO do selector vbetween files 
-% explore cerchi file 
-% rimuovi DM 
-fname=[num2str(casefile) '_RTLAB'];
+%Select the Simulink file to trasform in RTLAB file
+[casefile,path] = uigetfile('*.slx');
+casefile= erase(casefile,'.slx'); %remove '-slx' 
+fname=[num2str(casefile) '_RTLAB']; %create new file
 
 %Check if the file already exists and delete it if it does
 if exist(fname,'file') == 4
@@ -44,7 +44,7 @@ new_system(fname);
 
 %% Block SM 
 add_block('built-in/Subsystem',[ fname '/SM']);
-load_system(num2str(casefile)) % Load your file Simulink with the simulation grid 
+load_system([ num2str(path) '\' num2str(casefile)]); % Load your file Simulink with the simulation grid 
 Simulink.BlockDiagram.copyContentsToSubsystem(num2str(casefile),[ fname '/SM'])
 add_block('rtlab/OpComm',[ fname '/SM/OpComm']); %add OpComm 
 add_block('built-in/Inport',[ fname '/SM/Inport']);
